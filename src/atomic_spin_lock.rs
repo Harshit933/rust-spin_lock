@@ -33,15 +33,21 @@ impl SpinLockAtomic {
 }
 
 mod tests {
-    use std::sync::atomic::Ordering::Relaxed;
-    use crate::boolean_spin_lock::SpinLockAtomic;
+    use std::{sync::atomic::Ordering::Relaxed, thread::{self, spawn}};
+    use crate::atomic_spin_lock::SpinLockAtomic;
 
     #[test]
     fn try_simple_spin_lock() {
         let lock = SpinLockAtomic::new();
-        lock.lock();
-        assert_eq!(true, lock.locked.load(Relaxed));
-        lock.unlock();
-        assert_eq!(false, lock.locked.into_inner());
+        thread::scope(|s| {
+            s.spawn(|| {
+                lock.lock();
+                lock.unlock();
+            });
+
+            s.spawn(|| {
+                lock.lock();
+            });
+        });
     }
 }

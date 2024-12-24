@@ -1,6 +1,6 @@
 use std::{cell::UnsafeCell, sync::atomic::AtomicBool};
 
-use crate::safe_spin_lock::Guard;
+use crate::guard::Guard;
 
 pub struct SpinLock<T> {
     pub locked: AtomicBool,
